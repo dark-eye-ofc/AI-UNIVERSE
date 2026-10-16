@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDV-OS X DARK-EYE ZLI - IMAGE GEN STUDIO</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Manrope:wght@400;600;800&display=swap');
+*{font-family:'Manrope',sans-serif}
+.orbitron{font-family:'Orbitron',monospace}
+body{background:#07070d;color:#fff}
+.glass{background:rgba(20,20,30,.75);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08)}
+.btn-neon{background:linear-gradient(135deg,#00f5ff,#7a5cff,#ff00a0)}
+.tool-active{background:#00f5ff!important;color:#000!important;border-color:#00f5ff!important}
+.slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#00f5ff;cursor:pointer}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<header class="glass sticky top-0 z-50 border-b border-white/10 px-4 py-3 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<a href="../index.html" class="w-10 h-10 rounded-full glass flex items-center justify-center"><i class="fas fa-arrow-left text-xs"></i></a>
+<div class="w-10 h-10 rounded-2xl btn-neon flex items-center justify-center orbitron font-black text-xs">ZLI</div>
+<div>
+<h1 class="orbitron font-black text-xs tracking-widest">IMAGE GEN STUDIO • 8K</h1>
+<p class="text-[8px] text-gray-400 tracking-[0.3em]">GENERATE • EDIT • UPSCALE • INPAINT</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button onclick="openGallery()" class="glass px-4 py-2 rounded-full text-[10px]"><i class="fas fa-images mr-1"></i> GALLERY (<span id="galleryCount">0</span>)</button>
+<button class="btn-neon px-4 py-2 rounded-full text-[10px] font-bold orbitron">PRO MODE</button>
+</div>
+</header>
+
+<div class="max-w-[1600px] mx-auto grid lg:grid-cols-12 gap-4 p-4">
+
+<!-- LEFT: GENERATE PANEL -->
+<div class="lg:col-span-4 space-y-4">
+
+<!-- PROMPT BOX -->
+<div class="glass rounded-[2rem] p-5">
+<div class="flex justify-between items-center mb-3">
+<h3 class="orbitron font-bold text-[11px] tracking-widest"><i class="fas fa-wand-magic-sparkles mr-2 text-cyan-400"></i>PROMPT</h3>
+<div class="flex gap-1">
+<button onclick="enhancePrompt()" class="glass px-2 py-1 rounded-full text-[8px]">✨ ENHANCE</button>
+<button onclick="randomPrompt()" class="glass px-2 py-1 rounded-full text-[8px]">🎲 RANDOM</button>
+</div>
+</div>
+<textarea id="prompt" placeholder="Ultra realistic 8k studio fashion portrait, beautiful girl in black techwear, DARK-EYE glowing, cinematic lighting, pro, cool, hot, powerful, adorable, fantastic, fancy, aesthetic, legendary..." class="w-full h-28 glass bg-black/50 rounded-2xl p-3 text-xs outline-none focus:border-cyan-400 border border-white/10"></textarea>
+<textarea id="negPrompt" placeholder="Negative prompt (what to avoid): blurry, low quality, deformed..." class="w-full h-12 mt-2 glass bg-black/30 rounded-2xl p-3 text-[10px] outline-none border border-white/5"></textarea>
+
+<!-- QUICK STYLES -->
+<div class="mt-3">
+<p class="text-[9px] text-gray-400 mb-2">QUICK STYLES</p>
+<div class="flex flex-wrap gap-1.5">
+<button onclick="addStyle('ultra realistic 8k studio portrait')" class="style-btn glass px-2 py-1 rounded-full text-[9px]">REALISTIC 8K</button>
+<button onclick="addStyle('fashion model, vogue, editorial')" class="style-btn glass px-2 py-1 rounded-full text-[9px]">FASHION</button>
+<button onclick="addStyle('anime, studio ghibli, beautiful')" class="style-btn glass px-2 py-1 rounded-full text-[9px]">ANIME</button>
+<button onclick="addStyle('cyberpunk, neon city, techwear')" class="style-btn glass px-2 py-1 rounded-full text-[9px]">CYBERPUNK</button>
+<button onclick="addStyle('adorable, cute, kawaii, soft lighting')" class="style-btn glass px-2 py-1 rounded-full text-[9px]">ADORABLE</button>
+<button onclick="addStyle('legendary, powerful, godlike, epic')" class="style-btn glass px-2 py-1 rounded-full text-[9px]">LEGENDARY</button>
+</div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div class="glass rounded-[2rem] p-5">
+<h3 class="orbitron font-bold text-[11px] tracking-widest mb-4"><i class="fas fa-sliders mr-2 text-pink-400"></i>QUALITY & MODEL</h3>
+
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="text-[9px] text-gray-400">MODEL</label>
+<select id="model" class="w-full mt-1 glass bg-black rounded-full px-3 py-2 text-[11px] outline-none">
+<option value="pollinations">Pollinations XL (FREE)</option>
+<option value="turbo">Turbo Realistic</option>
+<option value="anime">Anime XL</option>
+<option value="flux">FLUX Pro</option>
+<option value="dalle">DALL-E 3 (API placeholder)</option>
+<option value="midjourney">Midjourney V6 (placeholder)</option>
+<option value="stability">Stability SDXL (placeholder)</option>
+</select>
+</div>
+<div>
+<label class="text-[9px] text-gray-400">QUALITY</label>
+<select id="quality" class="w-full mt-1 glass bg-black rounded-full px-3 py-2 text-[11px]">
+<option value="8k">8K ULTRA • 2048x2048</option>
+<option value="4k" selected>4K PRO • 1024x1024</option>
+<option value="2k">2K HD • 768x768</option>
+<option value="hd">HD • 512x512</option>
+<option value="custom">CUSTOM</option>
+</select>
+</div>
+<div>
+<label class="text-[9px] text-gray-400">ASPECT RATIO</label>
+<select id="ratio" class="w-full mt-1 glass bg-black rounded-full px-3 py-2 text-[11px]">
+<option value="1:1">1:1 Square</option>
+<option value="9:16">9:16 Portrait</option>
+<option value="16:9">16:9 Landscape</option>
+<option value="4:5">4:5 Fashion</option>
+<option value="3:4">3:4 Studio</option>
+</select>
+</div>
+<div>
+<label class="text-[9px] text-gray-400">IMAGES</label>
+<select id="count" class="w-full mt-1 glass bg-black rounded-full px-3 py-2 text-[11px]">
+<option>1</option><option>2</option><option selected>4</option><option>6</option>
+</select>
+</div>
+</div>
+
+<div class="mt-4 space-y-3">
+<div class="flex justify-between items-center"><label class="text-[9px] text-gray-400">STEPS: <span id="stepsVal">30</span></label><input type="range" id="steps" min="10" max="100" value="30" class="slider flex-1 ml-3"></div>
+<div class="flex justify-between items-center"><label class="text-[9px] text-gray-400">CFG: <span id="cfgVal">7.5</span></label><input type="range" id="cfg" min="1" max="20" step="0.5" value="7.5" class="slider flex-1 ml-3"></div>
+</div>
+
+<button onclick="generateImages()" id="genBtn" class="btn-neon w-full mt-5 py-4 rounded-full font-black orbitron text-xs tracking-widest">GENERATE ✨ <i class="fas fa-bolt ml-2"></i></button>
+<p class="text-[8px] text-gray-500 text-center mt-2">API: pollinations.ai (free) + placeholders for OpenAI, Stability, Replicate</p>
+</div>
+</div>
+
+<!-- CENTER: PREVIEW / EDITOR -->
+<div class="lg:col-span-5">
+<div class="glass rounded-[2rem] p-3">
+<!-- EDITOR TOOLBAR -->
+<div class="flex items-center justify-between mb-3 px-2">
+<h3 class="orbitron font-bold text-[11px]"><i class="fas fa-pen-ruler mr-2 text-cyan-400"></i>EDITOR - CHATGPT STYLE</h3>
+<div class="flex gap-1">
+<button onclick="undoEdit()" class="glass w-7 h-7 rounded-full text-[10px]"><i class="fas fa-undo"></i></button>
+<button onclick="redoEdit()" class="glass w-7 h-7 rounded-full text-[10px]"><i class="fas fa-redo"></i></button>
+<button onclick="downloadCurrent()" class="btn-neon px-3 py-1 rounded-full text-[9px]">DOWNLOAD</button>
+</div>
+</div>
+
+<!-- CANVAS -->
+<div class="bg-[#0e0e14] rounded-[1.5rem] overflow-hidden relative aspect-square flex items-center justify-center" id="canvasWrap">
+<canvas id="c" class="max-w-full max-h-full"></canvas>
+<div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-10">
+<div class="w-24 h-24 rounded-full btn-neon flex items-center justify-center text-3xl animate-pulse">🎨</div>
+<p class="orbitron font-black mt-6 text-sm">NO IMAGE YET</p>
+<p class="text-[10px] text-gray-400 mt-2">Generate an image or upload one to start editing like ChatGPT</p>
+<div class="mt-4 flex gap-2">
+<label class="glass px-4 py-2 rounded-full text-[10px] cursor-pointer"><i class="fas fa-upload mr-1"></i> UPLOAD<input type="file" id="upload" hidden accept="image/*" onchange="uploadImage(event)"></label>
+<button onclick="generateImages()" class="glass px-4 py-2 rounded-full text-[10px]">✨ GENERATE</button>
+</div>
+</div>
+<div id="loading" class="hidden absolute inset-0 bg-black/80 flex flex-col items-center justify-center"><div class="w-12 h-12 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div><p class="text-xs mt-4 orbitron animate-pulse">GENERATING 8K...</p></div>
+</div>
+
+<!-- EDIT TOOLS -->
+<div class="grid grid-cols-8 md:grid-cols-12 gap-1.5 mt-3">
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="setTool('select')" title="Select"><i class="fas fa-mouse-pointer"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="setTool('crop')" title="Crop"><i class="fas fa-crop"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('rotate')"><i class="fas fa-rotate"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('flip')"><i class="fas fa-arrows-left-right"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('removeBg')" title="Remove BG">BG</button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('upscale')" title="Upscale 8K"><i class="fas fa-up-right-from-square"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="setTool('brush')" title="Inpaint Brush"><i class="fas fa-paintbrush"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="setTool('text')" title="Add Text"><i class="fas fa-font"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('filter')" title="Filters"><i class="fas fa-wand-magic"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('adjust')" title="Adjust"><i class="fas fa-sliders"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('blur')"><i class="fas fa-droplet"></i></button>
+<button class="edit-btn glass py-2.5 rounded-xl text-[11px]" onclick="editAction('sticker')" title="Stickers">😍</button>
+</div>
+
+<!-- ADJUST PANEL -->
+<div id="adjustPanel" class="hidden glass rounded-2xl p-4 mt-3 grid grid-cols-2 gap-3">
+<div><label class="text-[9px]">BRIGHTNESS</label><input type="range" id="brightness" min="-100" max="100" value="0" oninput="applyFilter()" class="w-full slider"></div>
+<div><label class="text-[9px]">CONTRAST</label><input type="range" id="contrast" min="-100" max="100" value="0" oninput="applyFilter()" class="w-full slider"></div>
+<div><label class="text-[9px]">SATURATION</label><input type="range" id="saturation" min="-100" max="100" value="0" oninput="applyFilter()" class="w-full slider"></div>
+<div><label class="text-[9px]">BLUR</label><input type="range" id="blur" min="0" max="10" value="0" oninput="applyFilter()" class="w-full slider"></div>
+</div>
+
+<!-- TEXT PANEL -->
+<div id="textPanel" class="hidden glass rounded-2xl p-3 mt-3 flex gap-2">
+<input id="textInput" placeholder="Add text..." class="flex-1 glass bg-black rounded-full px-4 py-2 text-xs outline-none">
+<button onclick="addText()" class="btn-neon px-4 py-2 rounded-full text-xs">ADD</button>
+</div>
+</div>
+</div>
+
+<!-- RIGHT: RESULTS / HISTORY -->
+<div class="lg:col-span-3 space-y-4">
+<div class="glass rounded-[2rem] p-4">
+<h3 class="orbitron font-bold text-[11px] mb-3"><i class="fas fa-bolt mr-2 text-yellow-400"></i>RESULTS • <span id="resultCount">0</span></h3>
+<div id="results" class="grid grid-cols-2 gap-2 max-h-[60vh] overflow-y-auto">
+<div class="col-span-2 text-center py-10 text-[10px] text-gray-500">Generated images will appear here.<br>Click to edit in full editor.</div>
+</div>
+</div>
+
+<div class="glass rounded-[2rem] p-4">
+<h3 class="orbitron font-bold text-[10px] mb-2">API PLACEHOLDERS - FULL ACCESS</h3>
+<div class="space-y-1 text-[8px] text-gray-400 font-mono">
+<div>✅ Pollinations (free, no key)</div>
+<div>🔧 OpenAI DALL-E 3: <code>sk-...</code></div>
+<div>🔧 Stability: <code>sk-...</code></div>
+<div>🔧 Replicate: <code>r8_...</code></div>
+<div>🔧 Remove.bg: <code>API_KEY</code></div>
+<div>🔧 Upscale: <code>replicate.com/.../upscale</code></div>
+</div>
+<button onclick="document.getElementById('apiModal').classList.remove('hidden')" class="glass w-full mt-3 py-2 rounded-full text-[9px]">EDIT API KEYS</button>
+</div>
+</div>
+</div>
+
+<!-- API MODAL -->
+<div id="apiModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center p-4">
+<div class="glass rounded-[2rem] p-6 max-w-md w-full">
+<h3 class="orbitron font-bold text-xs">API KEYS - PLACEHOLDERS</h3>
+<div class="mt-4 space-y-2">
+<input id="openaiKey" placeholder="OpenAI sk-..." class="w-full glass bg-black rounded-full px-4 py-2 text-[10px]">
+<input id="stabilityKey" placeholder="Stability sk-..." class="w-full glass bg-black rounded-full px-4 py-2 text-[10px]">
+<input id="removeBgKey" placeholder="Remove.bg API..." class="w-full glass bg-black rounded-full px-4 py-2 text-[10px]">
+</div>
+<button onclick="document.getElementById('apiModal').classList.add('hidden')" class="btn-neon w-full mt-4 py-3 rounded-full text-xs font-bold">SAVE</button>
+</div>
+</div>
+
+<script>
+let canvas, historyStack=[], redoStack=[];
+let currentTool='select';
+canvas = new fabric.Canvas('c',{width:800,height:800,backgroundColor:'#0e0e14'});
+canvas.on('object:modified', saveHistory);
+
+function saveHistory(){historyStack.push(JSON.stringify(canvas)); if(historyStack.length>20) historyStack.shift();}
+
+function setTool(t){
+document.querySelectorAll('.edit-btn').forEach(b=>b.classList.remove('tool-active'));
+event?.target.closest('button')?.classList.add('tool-active');
+currentTool=t;
+document.getElementById('textPanel').classList.toggle('hidden', t!=='text');
+document.getElementById('adjustPanel').classList.toggle('hidden', t!=='adjust' && t!=='filter');
+if(t==='select'){canvas.isDrawingMode=false; canvas.selection=true;}
+if(t==='brush'){canvas.isDrawingMode=true; canvas.freeDrawingBrush.width=20; canvas.freeDrawingBrush.color='rgba(0,245,255,0.6)';}
+}
+
+function addStyle(s){document.getElementById('prompt').value += (document.getElementById('prompt').value?', ':'')+s;}
+function enhancePrompt(){const p=document.getElementById('prompt'); p.value='ultra realistic 8k, '+p.value+', studio lighting, cinematic, pro, cool, hot, powerful, adorable, fantastic, fancy, beautiful, aesthetic, legendary, sharp focus, highly detailed';}
+function randomPrompt(){const prompts=['8k studio fashion portrait, DARK-EYE ZLI, black techwear, glowing eyes','beautiful Shona girl, traditional attire, Zimbabwe village, sunset','powerful CEO, luxury office, aesthetic','adorable anime girl, kawaii, soft lighting']; document.getElementById('prompt').value=prompts[Math.floor(Math.random()*prompts.length)];}
+
+function getSize(){
+const q=document.getElementById('quality').value;
+const r=document.getElementById('ratio').value.split(':');
+let w=1024,h=1024;
+if(q==='8k'){w=2048;h=2048} else if(q==='4k'){w=1024;h=1024} else if(q==='2k'){w=768;h=768} else if(q==='hd'){w=512;h=512}
+if(r[0]!=r[1]){if(r[0]=='9'&&r[1]=='16'){h=w*16/9} if(r[0]=='16'&&r[1]=='9'){w=h*16/9} if(r[0]=='4'&&r[1]=='5'){h=w*5/4} if(r[0]=='3'&&r[1]=='4'){h=w*4/3}}
+return {w:Math.round(w),h:Math.round(h)};
+}
+
+async function generateImages(){
+const prompt=document.getElementById('prompt').value.trim();
+if(!prompt) return alert('Enter prompt');
+const count=parseInt(document.getElementById('count').value)||4;
+const size=getSize();
+const model=document.getElementById('model').value;
+document.getElementById('loading').classList.remove('hidden');
+document.getElementById('placeholder').classList.add('hidden');
+const resultsDiv=document.getElementById('results');
+resultsDiv.innerHTML='';
+document.getElementById('genBtn').innerHTML='GENERATING...';
+for(let i=0;i<count;i++){
+let url='';
+const seed=Math.floor(Math.random()*999999);
+if(model==='pollinations' || model==='turbo' || model==='anime' || model==='flux'){
+url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${size.w}&height=${size.h}&seed=${seed}&nologo=true&enhance=true`;
+} else {
+// PLACEHOLDER for paid APIs
+url=`https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${size.w}&height=${size.h}&seed=${seed}`;
+}
+const card=document.createElement('div');
+card.className='glass rounded-xl overflow-hidden cursor-pointer hover:ring-2 ring-cyan-400';
+card.innerHTML=`<img src="${url}" class="w-full aspect-square object-cover" loading="lazy"><div class="p-2 flex justify-between"><span class="text-[8px]">${size.w}x${size.h}</span><button class="text-[8px] text-cyan-400">EDIT</button></div>`;
+card.onclick=()=>loadToEditor(url);
+resultsDiv.appendChild(card);
+if(i===0) loadToEditor(url);
+await new Promise(r=>setTimeout(r,600));
+}
+document.getElementById('loading').classList.add('hidden');
+document.getElementById('genBtn').innerHTML='GENERATE ✨ <i class="fas fa-bolt ml-2"></i>';
+document.getElementById('resultCount').innerText=count;
+document.getElementById('galleryCount').innerText=parseInt(document.getElementById('galleryCount').innerText)+count;
+}
+
+function loadToEditor(url){
+document.getElementById('placeholder').classList.add('hidden');
+fabric.Image.fromURL(url, img=>{
+canvas.clear();
+const scale=Math.min(800/img.width,800/img.height);
+img.scale(scale);
+canvas.setWidth(img.width*scale);
+canvas.setHeight(img.height*scale);
+canvas.add(img);
+canvas.renderAll();
+canvas.setActiveObject(img);
+saveHistory();
+},{crossOrigin:'anonymous'});
+}
+
+function uploadImage(e){
+const file=e.target.files[0];
+if(!file) return;
+const reader=new FileReader();
+reader.onload=f=>loadToEditor(f.target.result);
+reader.readAsDataURL(file);
+}
+
+function editAction(action){
+if(action==='rotate'){const obj=canvas.getActiveObject(); if(obj){obj.rotate((obj.angle||0)+90); canvas.renderAll(); saveHistory();}}
+if(action==='flip'){const obj=canvas.getActiveObject(); if(obj){obj.set('flipX',!obj.flipX); canvas.renderAll();}}
+if(action==='removeBg'){alert('Remove BG - API Placeholder:\n\nEndpoint: https://api.remove.bg/v1.0/removebg\nKey: '+document.getElementById('removeBgKey').value+'\n\nCurrently using free placeholder: will add transparent bg via canvas');}
+if(action==='upscale'){alert('Upscale to 8K - Placeholder:\n\nReplicate API: https://api.replicate.com/v1/predictions\nModel: nightmareai/real-esrgan\nWill upscale current image to 4x');}
+if(action==='filter'){document.getElementById('adjustPanel').classList.toggle('hidden');}
+if(action==='adjust'){document.getElementById('adjustPanel').classList.toggle('hidden');}
+if(action==='blur'){canvas.getObjects().forEach(o=>{if(o.type==='image'){o.filters.push(new fabric.Image.filters.Blur({blur:0.2})); o.applyFilters();}}); canvas.renderAll();}
+if(action==='sticker'){const text=new fabric.Text('😍🔥✨', {left:100, top:100, fontSize:40}); canvas.add(text);}
+}
+
+function addText(){
+const txt=document.getElementById('textInput').value;
+if(!txt) return;
+const text=new fabric.Text(txt, {left:100, top:100, fontSize:30, fill:'#00f5ff', fontFamily:'Orbitron'});
+canvas.add(text);
+canvas.setActiveObject(text);
+saveHistory();
+}
+
+function applyFilter(){
+const b=parseInt(document.getElementById('brightness').value);
+const c=parseInt(document.getElementById('contrast').value);
+const s=parseInt(document.getElementById('saturation').value);
+const bl=parseFloat(document.getElementById('blur').value);
+const obj=canvas.getActiveObject();
+if(!obj || obj.type!=='image') return;
+obj.filters=[];
+if(b!==0) obj.filters.push(new fabric.Image.filters.Brightness({brightness:b/100}));
+if(c!==0) obj.filters.push(new fabric.Image.filters.Contrast({contrast:c/100}));
+if(s!==0) obj.filters.push(new fabric.Image.filters.Saturation({saturation:s/100}));
+if(bl>0) obj.filters.push(new fabric.Image.filters.Blur({blur:bl/20}));
+obj.applyFilters();
+canvas.renderAll();
+}
+
+function downloadCurrent(){
+const data=canvas.toDataURL({format:'png', quality:1, multiplier:2});
+const a=document.createElement('a'); a.href=data; a.download=`ZLI-8K-${Date.now()}.png`; a.click();
+}
+function undoEdit(){if(historyStack.length>1){redoStack.push(historyStack.pop()); canvas.loadFromJSON(historyStack[historyStack.length-1], ()=>canvas.renderAll());}}
+function redoEdit(){if(redoStack.length){const s=redoStack.pop(); historyStack.push(s); canvas.loadFromJSON(s, ()=>canvas.renderAll());}}
+function openGallery(){document.getElementById('results').scrollIntoView();}
+
+document.getElementById('steps').addEventListener('input', e=>document.getElementById('stepsVal').innerText=e.target.value);
+document.getElementById('cfg').addEventListener('input', e=>document.getElementById('cfgVal').innerText=e.target.value);
+</script>
+</body>
+  </html>
