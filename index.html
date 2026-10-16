@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDV-×-DARK-EYE-AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#08080a;color:#fff;font-family:'Inter',sans-serif;height:100vh;overflow:hidden}
+#top{height:64px;background:rgba(15,15,17,0.8);backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:100}
+#brand{font-weight:900;letter-spacing:-0.5px;font-size:16px;display:flex;align-items:center;gap:10px}
+#brand b{width:32px;height:32px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:14px}
+#statusDot{width:8px;height:8px;background:#00ff88;border-radius:50%;box-shadow:0 0 10px #00ff88;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+#center{margin-top:64px;height:calc(100vh - 64px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:30px 20px;overflow-y:auto;background:radial-gradient(800px 400px at 50% -100px, rgba(255,255,255,0.06), transparent), #08080a}
+#hero{max-width:720px;width:100%;text-align:center;margin-top:40px}
+#hero h1{font-size:48px;font-weight:900;letter-spacing:-2.5px;line-height:0.95;margin-bottom:16px;background:linear-gradient(180deg,#fff 0%, #999 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#hero p{color:#777;font-size:16px;line-height:1.5;margin-bottom:32px}
+#box{max-width:720px;width:100%;background:rgba(20,20,22,0.8);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:6px;backdrop-filter:blur(20px);box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+#inputRow{display:flex;align-items:end;gap:8px;padding:10px}
+#prompt{flex:1;background:transparent;border:none;color:#fff;font-size:15px;outline:none;resize:none;min-height:24px;max-height:120px;font-family:inherit;padding:8px 0}
+#prompt::placeholder{color:#555}
+#actions{display:flex;gap:8px;align-items:center}
+.btn{border:none;border-radius:12px;padding:10px 16px;font-weight:600;font-size:13px;cursor:pointer;transition:0.2s;display:flex;align-items:center;gap:6px}
+#buildBtn{background:#fff;color:#000}
+#buildBtn:hover{background:#e5e5e5;transform:translateY(-1px)}
+#previewBtn{background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.1)}
+#previewBtn:hover{background:rgba(255,255,255,0.12)}
+#previewBtn.hasApp{background:#ff0033;color:#fff;border-color:#ff0033;animation:pop 0.3s}
+@keyframes pop{0%{transform:scale(0.9)}100%{transform:scale(1)}}
+#chips{display:flex;gap:8px;padding:0 10px 12px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.06);color:#888;padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer}
+.chip:hover{color:#fff;border-color:rgba(255,255,255,0.15)}
+#log{max-width:720px;width:100%;margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.log{padding:14px 18px;border-radius:14px;font-size:13px;line-height:1.5}
+.log.u{background:#fff;color:#000;align-self:flex-end;max-width:80%;border-radius:14px 14px 2px 14px}
+.log.a{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);align-self:flex-start;max-width:85%}
+#overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column}
+#overlayTop{height:56px;background:rgba(15,15,17,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+#overlayFrame{flex:1;border:none;background:#000;width:100%}
+#loader{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:10px 18px;border-radius:30px;font-size:12px;font-weight:700;letter-spacing:1px;display:none;z-index:2000;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+@media(max-width:600px){#hero h1{font-size:36px}}
+</style>
+</head>
+<body>
+<div id="top">
+<div id="brand"><b>SD</b> SDV-×-DARK-EYE-AI <div id="statusDot"></div> <span style="font-weight:400;color:#666;font-size:11px;letter-spacing:2px;margin-left:6px">MOST INTELLIGENT</span></div>
+<div style="display:flex;gap:8px"><button class="btn" style="background:rgba(255,255,255,0.06);color:#fff" onclick="document.getElementById('overlay').style.display='flex'; if(lastHTML) document.getElementById('overlayFrame').srcdoc=lastHTML">PREVIEW</button></div>
+</div>
+
+<div id="center">
+<div id="hero">
+<h1>We are ready to build<br>anything you want.</h1>
+<p>The most intelligent, fastest, real builder. Type what you imagine and see it live — websites, apps, stores, everything — real working.</p>
+</div>
+
+<div id="box">
+<div id="inputRow">
+<textarea id="prompt" placeholder="Describe anything you want to build..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+<div id="actions">
+<button id="previewBtn" class="btn" onclick="showPreview()">◐ PREVIEW</button>
+<button id="buildBtn" class="btn" onclick="build()">BUILD →</button>
+</div>
+</div>
+<div id="chips">
+<div class="chip" onclick="setPrompt('Build a premium portfolio website for a designer with best UI')">Portfolio</div>
+<div class="chip" onclick="setPrompt('Build a music streaming app with real songs and best dark UI')">Music App</div>
+<div class="chip" onclick="setPrompt('Build a beautiful e-commerce store with cart and checkout, best design')">Store</div>
+<div class="chip" onclick="setPrompt('Build a video streaming app with 20 real videos, best Netflix style UI')">Video App</div>
+<div class="chip" onclick="setPrompt('Build a modern SaaS landing page with pricing, best design ever')">SaaS Page</div>
+</div>
+</div>
+
+<div id="log"></div>
+</div>
+
+<div id="overlay">
+<div id="overlayTop">
+<div style="font-weight:700;letter-spacing:1px;font-size:13px">LIVE PREVIEW • REAL • FAST • BEST UI</div>
+<div style="display:flex;gap:8px">
+<button class="btn" style="background:rgba(255,255,255,0.08);color:#fff" onclick="downloadFile()">DOWNLOAD</button>
+<button class="btn" style="background:#fff;color:#000" onclick="hidePreview()">CLOSE ✕</button>
+</div>
+</div>
+<iframe id="overlayFrame"></iframe>
+</div>
+
+<div id="loader">🧠 BUILDING — MOST INTELLIGENT • REAL FAST • BEST UI</div>
+
+<script>
+// === PUT YOUR GEMINI API KEY HERE ===
+const GEMINI_API_KEY = "AQ.Ab8RN6KykQ-rEPAYgDamZDJJCge5r7OfPBfY5KsSeQsBSu613A
+";
+// ====================================
+
+let lastHTML="";
+
+const BRAIN=`You are SDV-×-DARK-EYE-AI V2 - The most intelligent, most fast, most real builder ever. You build anything with the MOST BEST UI DESIGN in the world - award winning, 2026, ultra premium, modern, minimalist luxury, glassmorphism, animations, fully responsive, real working.
+
+CRITICAL RULES:
+• You MUST output ONE single self-contained HTML file with all CSS+JS inline.
+• Design must be BEST EVER - think Stripe, Linear, Vercel, Apple level.
+• For videos use ONLY these real YouTube IDs: fRh_vgS2dFE, sLV-fbDx0eU, kAncxuwCPZg, urYYpkcayvQ, elei_RqOrmg, kPi6cPk8iRo, m9x2GuO2r_4, WFpFOHgrYlI, _VVs1VhxxJU, TiC8Z2TZ1Sk, 4uW6hL6y8aU, 9Auq9mYxFEE, bM2N-vwGL8s, gfCaqYW5PZc. Reuse with different titles.
+• For live content use official embeddable urls: sabc-plus.com, etv.co.za, startimestv.com, dstv.com, showmax.com - inside iframe.
+• Output MUST be wrapped in ```html... ``` block - mandatory for system to extract.
+• Make it REAL, INTERACTIVE, FUNCTIONAL, not fake placeholder.
+• End with <!-- BUILT BY SDV-×-DARK-EYE-AI -->`;
+
+function setPrompt(t){document.getElementById('prompt').value=t;document.getElementById('prompt').focus();}
+function addLog(t,c){const box=document.getElementById('log');const d=document.createElement('div');d.className='log '+c;d.innerHTML=t;box.appendChild(d);box.scrollTop=box.scrollHeight;}
+
+function showPreview(){
+if(!lastHTML){alert('Build something first — then click PREVIEW on left to see your app');return;}
+document.getElementById('overlay').style.display='flex';
+document.getElementById('overlayFrame').srcdoc=lastHTML;
+}
+function hidePreview(){document.getElementById('overlay').style.display='none';}
+
+async function build(){
+const p=document.getElementById('prompt').value.trim();
+if(!p)return;
+if(GEMINI_API_KEY.includes('PUT_YOUR')){alert('Owner: Set API key in code first');return;}
+
+addLog(p,'u');
+document.getElementById('prompt').value='';
+document.getElementById('loader').style.display='block';
+document.getElementById('buildBtn').innerText='BUILDING...';
+
+try{
+const url=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY};
+const body={system_instruction:{parts:[{text:BRAIN}]},contents:[{parts:[{text:p}]}],generationConfig:{temperature:0.9,maxOutputTokens:30000}};
+const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+const j=await r.json();
+if(j.error){addLog('Error: '+j.error.message,'a');return;}
+let txt=j.candidates[0].content.parts[0].text;
+let m=txt.match(/html([\s\S]*?)/);
+let html=m?m[1]:txt;
+lastHTML=html;
+
+// Activate preview button on left
+const pb=document.getElementById('previewBtn');
+pb.classList.add('hasApp');
+pb.innerText='◉ PREVIEW READY — CLICK';
+
+addLog('✅ Built — Most best UI, real, fast, intelligent. Click PREVIEW on left to see your app live now. It works real.','a');
+
+// Auto show preview
+showPreview();
+
+}catch(e){addLog('Error: '+e.message,'a');}
+finally{
+document.getElementById('loader').style.display='none';
+document.getElementById('buildBtn').innerText='BUILD →';
+}
+}
+
+function downloadFile(){if(!lastHTML){alert('Build first');return;}const b=new Blob([lastHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sdv-dark-eye-app.html';a.click();}
+</script>
+</body>
+</html>
